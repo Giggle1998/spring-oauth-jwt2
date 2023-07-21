@@ -2,6 +2,7 @@ package com.crit.oauthjwt2.service;
 
 import com.crit.oauthjwt2.common.security.SecurityUtil;
 import com.crit.oauthjwt2.dto.*;
+import com.crit.oauthjwt2.entity.User;
 import com.crit.oauthjwt2.entity.UserRepository;
 import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,12 @@ public class KakaoRequestService implements RequestService {
         System.out.println("=========getUserInfo 중==============");
         KakaoUserInfo kakaoUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
+        Long id = kakaoUserInfo.getId();
+        String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickname();
+        String email = kakaoUserInfo.getKakaoAccount().getEmail();
+
+
+        // 기존 유저 정보가 존재하면
         if(userRepository.existsById(String.valueOf(kakaoUserInfo.getId()))){
             String accessToken = securityUtil.createAccessToken(
                     String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
@@ -47,15 +54,22 @@ public class KakaoRequestService implements RequestService {
                     String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
             return SignInResponse.builder()
                     .authProvider(AuthProvider.KAKAO)
-                    .kakaoUserInfo(null)
+                    .id(String.valueOf(id))
+                    .nickname(nickname)
+                    .email(email)
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
         } else {
-            return SignInResponse.builder()
+            SignInResponse signInResponse = SignInResponse.builder()
                     .authProvider(AuthProvider.KAKAO)
-                    .kakaoUserInfo(kakaoUserInfo)
+                    .id(String.valueOf(id))
+                    .nickname(nickname)
+                    .email(email)
                     .build();
+            User userEntity = signInResponse.toEntity();
+            userRepository.save(userEntity);
+            return signInResponse;
         }
     }
 

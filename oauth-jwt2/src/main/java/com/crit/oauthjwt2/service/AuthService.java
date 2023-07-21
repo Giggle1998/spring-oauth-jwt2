@@ -54,7 +54,6 @@ public class AuthService {
 
         return SignInResponse.builder()
                 .authProvider(AuthProvider.findByCode(provider.toLowerCase()))
-                .kakaoUserInfo(null)
                 .accessToken(accessToken)
                 .refreshToken(null)
                 .build();
