@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.common.exception.response;
+package com.crit.oauthjwt2.common.exception.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

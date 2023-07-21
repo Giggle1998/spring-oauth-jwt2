@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.entity;
+package com.crit.oauthjwt2.entity;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;

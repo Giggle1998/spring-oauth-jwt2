@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.common.exception;
+package com.crit.oauthjwt2.common.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

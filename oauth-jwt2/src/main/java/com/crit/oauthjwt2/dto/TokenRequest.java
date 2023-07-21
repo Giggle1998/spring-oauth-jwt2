@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.dto;
+package com.crit.oauthjwt2.dto;
 
 import lombok.Builder;
 import lombok.Getter;

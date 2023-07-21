@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.common.config;
+package com.crit.oauthjwt2.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

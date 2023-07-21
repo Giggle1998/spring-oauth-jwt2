@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.common.security;
+package com.crit.oauthjwt2.common.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -1,6 +1,6 @@
-package com.seogineer.demooauthspringboot.entity;
+package com.crit.oauthjwt2.entity;
 
-import com.seogineer.demooauthspringboot.enumType.AuthProvider;
+import com.crit.oauthjwt2.enumType.AuthProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

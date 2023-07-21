@@ -1,7 +1,7 @@
-package com.seogineer.demooauthspringboot.common.advice;
+package com.crit.oauthjwt2.common.advice;
 
-import com.seogineer.demooauthspringboot.common.exception.BadRequestException;
-import com.seogineer.demooauthspringboot.common.exception.response.ErrorResponse;
+import com.crit.oauthjwt2.common.exception.BadRequestException;
+import com.crit.oauthjwt2.common.exception.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

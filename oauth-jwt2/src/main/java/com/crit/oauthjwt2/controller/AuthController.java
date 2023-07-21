@@ -1,8 +1,8 @@
-package com.seogineer.demooauthspringboot.controller;
+package com.crit.oauthjwt2.controller;
 
-import com.seogineer.demooauthspringboot.dto.SignInResponse;
-import com.seogineer.demooauthspringboot.dto.TokenRequest;
-import com.seogineer.demooauthspringboot.service.AuthService;
+import com.crit.oauthjwt2.dto.SignInResponse;
+import com.crit.oauthjwt2.dto.TokenRequest;
+import com.crit.oauthjwt2.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +17,9 @@ public class AuthController {
             @PathVariable("registrationId") String registrationId
             , @RequestParam("code") String code
             , @RequestParam("state") String state) {
+        System.out.println("=======================");
+        System.out.println(registrationId + code + state);
+        System.out.println("=======================");
         return ResponseEntity.ok(
                 authService.redirect(
                     TokenRequest.builder()

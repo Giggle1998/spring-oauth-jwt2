@@ -1,7 +1,7 @@
-package com.seogineer.demooauthspringboot.entity;
+package com.crit.oauthjwt2.entity;
 
-import com.seogineer.demooauthspringboot.enumType.AuthProvider;
-import com.seogineer.demooauthspringboot.enumType.Role;
+import com.crit.oauthjwt2.enumType.AuthProvider;
+import com.crit.oauthjwt2.enumType.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,14 +34,7 @@ public class User extends BaseTimeEntity {
     private AuthProvider authProvider;
 
     @Builder
-    public User(
-            String id
-            , String nickname
-            , String email
-            , String profileImageUrl
-            , Role role
-            , AuthProvider authProvider
-    ){
+    public User(String id, String nickname, String email, String profileImageUrl, Role role, AuthProvider authProvider){
         this.id = id;
         this.nickname = nickname;
         this.email = email;

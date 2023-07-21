@@ -1,10 +1,12 @@
-package com.seogineer.demooauthspringboot.service;
+package com.crit.oauthjwt2.service;
 
-import com.seogineer.demooauthspringboot.common.exception.BadRequestException;
-import com.seogineer.demooauthspringboot.common.security.SecurityUtil;
-import com.seogineer.demooauthspringboot.dto.*;
-import com.seogineer.demooauthspringboot.entity.UserRepository;
-import com.seogineer.demooauthspringboot.enumType.AuthProvider;
+import com.crit.oauthjwt2.common.exception.BadRequestException;
+import com.crit.oauthjwt2.common.security.SecurityUtil;
+import com.crit.oauthjwt2.dto.SignInResponse;
+import com.crit.oauthjwt2.dto.TokenRequest;
+import com.crit.oauthjwt2.dto.TokenResponse;
+import com.crit.oauthjwt2.entity.UserRepository;
+import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
-package com.seogineer.demooauthspringboot.dto;
+package com.crit.oauthjwt2.dto;
 
-import com.seogineer.demooauthspringboot.enumType.AuthProvider;
+import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,8 +1,8 @@
-package com.seogineer.demooauthspringboot.service;
+package com.crit.oauthjwt2.service;
 
-import com.seogineer.demooauthspringboot.dto.SignInResponse;
-import com.seogineer.demooauthspringboot.dto.TokenRequest;
-import com.seogineer.demooauthspringboot.dto.TokenResponse;
+import com.crit.oauthjwt2.dto.SignInResponse;
+import com.crit.oauthjwt2.dto.TokenRequest;
+import com.crit.oauthjwt2.dto.TokenResponse;
 
 public interface RequestService<T> {
     SignInResponse redirect(TokenRequest tokenRequest);

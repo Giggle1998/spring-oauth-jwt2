@@ -1,6 +1,6 @@
-package com.seogineer.demooauthspringboot.common.security;
+package com.crit.oauthjwt2.common.security;
 
-import com.seogineer.demooauthspringboot.enumType.AuthProvider;
+import com.crit.oauthjwt2.enumType.AuthProvider;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

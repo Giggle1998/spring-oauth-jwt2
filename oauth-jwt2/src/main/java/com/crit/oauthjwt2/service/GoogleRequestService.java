@@ -1,12 +1,12 @@
-package com.seogineer.demooauthspringboot.service;
+package com.crit.oauthjwt2.service;
 
-import com.seogineer.demooauthspringboot.common.security.SecurityUtil;
-import com.seogineer.demooauthspringboot.dto.GoogleUserInfo;
-import com.seogineer.demooauthspringboot.dto.SignInResponse;
-import com.seogineer.demooauthspringboot.dto.TokenRequest;
-import com.seogineer.demooauthspringboot.dto.TokenResponse;
-import com.seogineer.demooauthspringboot.entity.UserRepository;
-import com.seogineer.demooauthspringboot.enumType.AuthProvider;
+import com.crit.oauthjwt2.common.security.SecurityUtil;
+import com.crit.oauthjwt2.dto.GoogleUserInfo;
+import com.crit.oauthjwt2.dto.SignInResponse;
+import com.crit.oauthjwt2.dto.TokenRequest;
+import com.crit.oauthjwt2.dto.TokenResponse;
+import com.crit.oauthjwt2.entity.UserRepository;
+import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

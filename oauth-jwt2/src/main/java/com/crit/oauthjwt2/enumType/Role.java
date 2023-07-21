@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.enumType;
+package com.crit.oauthjwt2.enumType;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.seogineer.demooauthspringboot.dto;
+package com.crit.oauthjwt2.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

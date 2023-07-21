@@ -1,12 +1,9 @@
-package com.seogineer.demooauthspringboot.service;
+package com.crit.oauthjwt2.service;
 
-import com.seogineer.demooauthspringboot.common.security.SecurityUtil;
-import com.seogineer.demooauthspringboot.dto.SignInResponse;
-import com.seogineer.demooauthspringboot.dto.TokenRequest;
-import com.seogineer.demooauthspringboot.dto.TokenResponse;
-import com.seogineer.demooauthspringboot.dto.KakaoUserInfo;
-import com.seogineer.demooauthspringboot.entity.UserRepository;
-import com.seogineer.demooauthspringboot.enumType.AuthProvider;
+import com.crit.oauthjwt2.common.security.SecurityUtil;
+import com.crit.oauthjwt2.dto.*;
+import com.crit.oauthjwt2.entity.UserRepository;
+import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -32,12 +29,15 @@ public class KakaoRequestService implements RequestService {
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String REDIRECT_URI;
 
-    @Value("${spring.security.oauth2.client.provider.kakao.token_uri}")
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
     private String TOKEN_URI;
 
     @Override
     public SignInResponse redirect(TokenRequest tokenRequest) {
+        System.out.println(tokenRequest.getRegistrationId());
+        System.out.println("=========getToken 중==============");
         TokenResponse tokenResponse = getToken(tokenRequest);
+        System.out.println("=========getUserInfo 중==============");
         KakaoUserInfo kakaoUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
         if(userRepository.existsById(String.valueOf(kakaoUserInfo.getId()))){
@@ -66,7 +66,10 @@ public class KakaoRequestService implements RequestService {
         formData.add("redirect_uri", REDIRECT_URI);
         formData.add("client_id", CLIENT_ID);
         formData.add("code", tokenRequest.getCode());
-
+        System.out.println(GRANT_TYPE);
+        System.out.println(REDIRECT_URI);
+        System.out.println(CLIENT_ID);
+        System.out.println(tokenRequest.getCode());
         return webClient.mutate()
                 .baseUrl(TOKEN_URI)
                 .build()

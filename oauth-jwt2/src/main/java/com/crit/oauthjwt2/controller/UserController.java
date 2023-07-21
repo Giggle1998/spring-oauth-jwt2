@@ -1,7 +1,7 @@
-package com.seogineer.demooauthspringboot.controller;
+package com.crit.oauthjwt2.controller;
 
-import com.seogineer.demooauthspringboot.dto.SignUpRequest;
-import com.seogineer.demooauthspringboot.service.UserService;
+import com.crit.oauthjwt2.dto.SignUpRequest;
+import com.crit.oauthjwt2.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
