@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -19,7 +21,7 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String nickname;
 
-//    @Column(nullable = false)
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
@@ -36,8 +38,13 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private AuthProvider authProvider;
 
+    @Column(length = 300)
+    private String refreshToken;
+
+    private Date tokenExpirationTime;
+
     @Builder
-    public User(String id, String nickname, String password, String email, String profileImageUrl, Role role, AuthProvider authProvider){
+    public User(String id, String nickname, String password, String email, String profileImageUrl, Role role, AuthProvider authProvider, String refreshToken, Date tokenExpirationTime){
         this.id = id;
         this.nickname = nickname;
         this.password = password;
@@ -45,6 +52,20 @@ public class User extends BaseTimeEntity {
         this.profileImageUrl = profileImageUrl;
         this.role = role;
         this.authProvider = authProvider;
+        this.refreshToken = refreshToken;
+        this.tokenExpirationTime = tokenExpirationTime;
+    }
+
+    /*
+    ** 엔티티 관련 비즈니스 로직
+     */
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void expireRefreshToken(Date now) {
+        this.tokenExpirationTime = now;
     }
 
     public User update(String name, String picture){

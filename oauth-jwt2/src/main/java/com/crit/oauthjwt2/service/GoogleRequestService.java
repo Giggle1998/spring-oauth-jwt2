@@ -1,10 +1,7 @@
 package com.crit.oauthjwt2.service;
 
 import com.crit.oauthjwt2.common.security.SecurityUtil;
-import com.crit.oauthjwt2.dto.GoogleUserInfo;
-import com.crit.oauthjwt2.dto.OAuthSignInResponse;
-import com.crit.oauthjwt2.dto.TokenRequest;
-import com.crit.oauthjwt2.dto.TokenResponse;
+import com.crit.oauthjwt2.dto.*;
 import com.crit.oauthjwt2.entity.User;
 import com.crit.oauthjwt2.entity.UserRepository;
 import com.crit.oauthjwt2.enumType.AuthProvider;
@@ -47,9 +44,9 @@ public class GoogleRequestService implements RequestService {
         TokenResponse tokenResponse = getToken(tokenRequest);
         GoogleUserInfo googleUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
-        String accessToken = securityUtil.createAccessToken(
+        TokenDto accessTokenDto = securityUtil.createAccessToken(
                 googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getAccessToken());
-        String refreshToken = securityUtil.createRefreshToken(
+        TokenDto refreshTokenDto = securityUtil.createRefreshToken(
                 googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getRefreshToken());
 
         OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
@@ -57,8 +54,8 @@ public class GoogleRequestService implements RequestService {
                 .id(googleUserInfo.getId())
                 .nickname(googleUserInfo.getName())
                 .email(googleUserInfo.getEmail())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(accessTokenDto.getToken())
+                .refreshToken(refreshTokenDto.getToken())
                 .build();
 
         if(!userRepository.existsById(googleUserInfo.getId())){

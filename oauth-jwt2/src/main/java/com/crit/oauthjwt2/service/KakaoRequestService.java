@@ -48,10 +48,10 @@ public class KakaoRequestService implements RequestService {
         String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickname();
         String email = kakaoUserInfo.getKakaoAccount().getEmail();
 
-        String accessToken = securityUtil.createAccessToken(
+        TokenDto accessTokenDto = securityUtil.createAccessToken(
                 String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
         // 진짜 Refresh Token을 만드는 과정
-        String refreshToken = securityUtil.createRefreshToken(
+        TokenDto refreshTokenDto = securityUtil.createRefreshToken(
                 String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
 
         OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
@@ -59,8 +59,8 @@ public class KakaoRequestService implements RequestService {
                 .id(String.valueOf(id))
                 .nickname(nickname)
                 .email(email)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(accessTokenDto.getToken())
+                .refreshToken(refreshTokenDto.getToken())
                 .build();
 
         // 기존 유저 정보가 존재하면 DB에 저장

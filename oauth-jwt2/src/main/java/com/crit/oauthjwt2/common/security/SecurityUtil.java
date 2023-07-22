@@ -1,5 +1,6 @@
 package com.crit.oauthjwt2.common.security;
 
+import com.crit.oauthjwt2.dto.TokenDto;
 import com.crit.oauthjwt2.enumType.AuthProvider;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,10 @@ import java.util.HashMap;
 public class SecurityUtil {
     @Value("app.auth.token-secret") private String secret;
 
-    private static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 2L; // 2 hours
+    private static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60L; // 1 hours
     private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30L; // 30 days
 
-    public String createAccessToken(
+    public TokenDto createAccessToken(
             String userId, AuthProvider provider, String accessToken) {
         HashMap<String, Object> claim = new HashMap<>();
         claim.put("userId", userId);
@@ -26,7 +27,7 @@ public class SecurityUtil {
         return createJwt("ACCESS_TOKEN", ACCESS_TOKEN_EXPIRATION_TIME, claim);
     }
 
-    public String createRefreshToken(
+    public TokenDto createRefreshToken(
             String userId, AuthProvider provider, String refreshToken) {
         HashMap<String, Object> claim = new HashMap<>();
         claim.put("userId", userId);
@@ -35,7 +36,7 @@ public class SecurityUtil {
         return createJwt("REFRESH_TOKEN", REFRESH_TOKEN_EXPIRATION_TIME, claim);
     }
 
-    public String createJwt(String subject, Long expiration, HashMap<String, Object> claim) {
+    public TokenDto createJwt(String subject, Long expiration, HashMap<String, Object> claim) {
         JwtBuilder jwtBuilder = Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setSubject(subject)
@@ -45,12 +46,15 @@ public class SecurityUtil {
         if (claim != null) {
             jwtBuilder.setClaims(claim);
         }
-        // 기간이
+        // 기간
+        Date date = null;
         if (expiration != null) {
-            jwtBuilder.setExpiration(new Date(new Date().getTime() + expiration));
+            date = new Date(new Date().getTime() + expiration);
+            jwtBuilder.setExpiration(date);
         }
-
-        return jwtBuilder.compact();
+        String token = jwtBuilder.compact();
+        Date tokenExpirationTime = date;
+        return new TokenDto(token, tokenExpirationTime);
     }
 
     /**

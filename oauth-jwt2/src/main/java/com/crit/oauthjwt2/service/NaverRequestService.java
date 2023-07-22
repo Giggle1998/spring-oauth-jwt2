@@ -41,9 +41,9 @@ public class NaverRequestService implements RequestService {
         TokenResponse tokenResponse = getToken(tokenRequest);
         NaverUserInfo naverUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
-        String accessToken = securityUtil.createAccessToken(
+        TokenDto accessTokenDto = securityUtil.createAccessToken(
                 naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getAccessToken());
-        String refreshToken = securityUtil.createRefreshToken(
+        TokenDto refreshTokenDto = securityUtil.createRefreshToken(
                 naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getRefreshToken());
 
         OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
@@ -51,8 +51,8 @@ public class NaverRequestService implements RequestService {
                 .id(naverUserInfo.getResponse().getId())
                 .nickname(naverUserInfo.getResponse().getName())
                 .email(naverUserInfo.getResponse().getEmail())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(accessTokenDto.getToken())
+                .refreshToken(refreshTokenDto.getToken())
                 .build();
 
         if(!userRepository.existsById(naverUserInfo.getResponse().getId())){

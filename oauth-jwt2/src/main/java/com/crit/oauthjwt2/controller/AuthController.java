@@ -28,7 +28,7 @@ public class AuthController {
                             .state(state)
                             .build()));
     }
-    // refreshToken 변경최신화 및 accessToken 생성
+    // accessToken 생성 컨트롤러
     @PostMapping("/auth/token")
     public ResponseEntity<OAuthSignInResponse> refreshToken(@RequestBody TokenRequest tokenRequest){
         return ResponseEntity.ok(authService.refreshToken(tokenRequest));

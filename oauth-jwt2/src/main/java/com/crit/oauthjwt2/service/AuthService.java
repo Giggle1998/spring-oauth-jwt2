@@ -3,6 +3,7 @@ package com.crit.oauthjwt2.service;
 import com.crit.oauthjwt2.common.exception.BadRequestException;
 import com.crit.oauthjwt2.common.security.SecurityUtil;
 import com.crit.oauthjwt2.dto.OAuthSignInResponse;
+import com.crit.oauthjwt2.dto.TokenDto;
 import com.crit.oauthjwt2.dto.TokenRequest;
 import com.crit.oauthjwt2.dto.TokenResponse;
 import com.crit.oauthjwt2.entity.UserRepository;
@@ -34,9 +35,8 @@ public class AuthService {
     public OAuthSignInResponse refreshToken(TokenRequest tokenRequest){
         String userId = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("userId");
         String provider = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("provider");
-        // 예전 토큰
         String oldRefreshToken = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("refreshToken");
-        // ID와 소셜을 매칭해 사용자 찾기 없으면 에러처리
+
         if(!userRepository.existsByIdAndAuthProvider(userId, AuthProvider.findByCode(provider))){
             throw new BadRequestException("CANNOT_FOUND_USER");
         }
@@ -50,12 +50,12 @@ public class AuthService {
             tokenResponse = googleRequestService.getRefreshToken(provider, oldRefreshToken);
         }
         // access 토큰 생성
-        String accessToken = securityUtil.createAccessToken(
+        TokenDto accessTokenDto = securityUtil.createAccessToken(
                 userId, AuthProvider.findByCode(provider.toLowerCase()), tokenResponse.getAccessToken());
 
         return OAuthSignInResponse.builder()
                 .authProvider(AuthProvider.findByCode(provider.toLowerCase()))
-                .accessToken(accessToken)
+                .accessToken(accessTokenDto.getToken())
                 .refreshToken(null)
                 .build();
     }
