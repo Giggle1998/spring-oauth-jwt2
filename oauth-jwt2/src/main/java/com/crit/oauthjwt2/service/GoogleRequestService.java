@@ -47,30 +47,26 @@ public class GoogleRequestService implements RequestService {
         TokenResponse tokenResponse = getToken(tokenRequest);
         GoogleUserInfo googleUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
-        if(userRepository.existsById(googleUserInfo.getId())){
-            String accessToken = securityUtil.createAccessToken(
-                    googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getAccessToken());
-            String refreshToken = securityUtil.createRefreshToken(
-                    googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getRefreshToken());
-            return OAuthSignInResponse.builder()
-                    .authProvider(AuthProvider.GOOGLE)
-                    .id(googleUserInfo.getId())
-                    .nickname(googleUserInfo.getName())
-                    .email(googleUserInfo.getEmail())
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-        } else {
-            OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
-                    .authProvider(AuthProvider.GOOGLE)
-                    .id(googleUserInfo.getId())
-                    .nickname(googleUserInfo.getName())
-                    .email(googleUserInfo.getEmail())
-                    .build();
+        String accessToken = securityUtil.createAccessToken(
+                googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getAccessToken());
+        String refreshToken = securityUtil.createRefreshToken(
+                googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getRefreshToken());
+
+        OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
+                .authProvider(AuthProvider.GOOGLE)
+                .id(googleUserInfo.getId())
+                .nickname(googleUserInfo.getName())
+                .email(googleUserInfo.getEmail())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        if(!userRepository.existsById(googleUserInfo.getId())){
             User userEntity = oAuthSignInResponse.toEntity();
             userRepository.save(userEntity);
-            return oAuthSignInResponse;
         }
+        return oAuthSignInResponse;
+
     }
 
     @Override

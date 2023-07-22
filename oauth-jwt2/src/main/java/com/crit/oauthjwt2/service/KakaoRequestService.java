@@ -38,6 +38,9 @@ public class KakaoRequestService implements RequestService {
         System.out.println(tokenRequest.getRegistrationId());
         System.out.println("=========getToken 중==============");
         TokenResponse tokenResponse = getToken(tokenRequest);
+        System.out.println(tokenResponse.getAccessToken());
+        System.out.println(tokenResponse.getRefreshToken());
+        System.out.println(tokenResponse.getRefreshTokenExpiresIn());
         System.out.println("=========getUserInfo 중==============");
         KakaoUserInfo kakaoUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
@@ -45,32 +48,27 @@ public class KakaoRequestService implements RequestService {
         String nickname = kakaoUserInfo.getKakaoAccount().getProfile().getNickname();
         String email = kakaoUserInfo.getKakaoAccount().getEmail();
 
+        String accessToken = securityUtil.createAccessToken(
+                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
+        // 진짜 Refresh Token을 만드는 과정
+        String refreshToken = securityUtil.createRefreshToken(
+                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
 
-        // 기존 유저 정보가 존재하면
-        if(userRepository.existsById(String.valueOf(kakaoUserInfo.getId()))){
-            String accessToken = securityUtil.createAccessToken(
-                    String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
-            String refreshToken = securityUtil.createRefreshToken(
-                    String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
-            return OAuthSignInResponse.builder()
-                    .authProvider(AuthProvider.KAKAO)
-                    .id(String.valueOf(id))
-                    .nickname(nickname)
-                    .email(email)
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-        } else {
-            OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
-                    .authProvider(AuthProvider.KAKAO)
-                    .id(String.valueOf(id))
-                    .nickname(nickname)
-                    .email(email)
-                    .build();
+        OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
+                .authProvider(AuthProvider.KAKAO)
+                .id(String.valueOf(id))
+                .nickname(nickname)
+                .email(email)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        // 기존 유저 정보가 존재하면 DB에 저장
+        if(!userRepository.existsById(String.valueOf(kakaoUserInfo.getId()))){
             User userEntity = oAuthSignInResponse.toEntity();
             userRepository.save(userEntity);
-            return oAuthSignInResponse;
         }
+        return oAuthSignInResponse;
     }
 
     @Override

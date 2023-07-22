@@ -41,30 +41,27 @@ public class NaverRequestService implements RequestService {
         TokenResponse tokenResponse = getToken(tokenRequest);
         NaverUserInfo naverUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
-        if(userRepository.existsById(naverUserInfo.getResponse().getId())){
-            String accessToken = securityUtil.createAccessToken(
-                    naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getAccessToken());
-            String refreshToken = securityUtil.createRefreshToken(
-                    naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getRefreshToken());
-            return OAuthSignInResponse.builder()
-                    .authProvider(AuthProvider.NAVER)
-                    .id(naverUserInfo.getResponse().getId())
-                    .nickname(naverUserInfo.getResponse().getName())
-                    .email(naverUserInfo.getResponse().getEmail())
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-        } else {
-            OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
-                    .authProvider(AuthProvider.NAVER)
-                    .id(naverUserInfo.getResponse().getId())
-                    .nickname(naverUserInfo.getResponse().getName())
-                    .email(naverUserInfo.getResponse().getEmail())
-                    .build();
+        String accessToken = securityUtil.createAccessToken(
+                naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getAccessToken());
+        String refreshToken = securityUtil.createRefreshToken(
+                naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getRefreshToken());
+
+        OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
+                .authProvider(AuthProvider.NAVER)
+                .id(naverUserInfo.getResponse().getId())
+                .nickname(naverUserInfo.getResponse().getName())
+                .email(naverUserInfo.getResponse().getEmail())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        if(!userRepository.existsById(naverUserInfo.getResponse().getId())){
             User userEntity = oAuthSignInResponse.toEntity();
             userRepository.save(userEntity);
-            return oAuthSignInResponse;
         }
+
+        return oAuthSignInResponse;
+
     }
 
     @Override
