@@ -29,7 +29,7 @@ public class SecurityConfig {
             .and()
             .oauth2Login()
             .redirectionEndpoint()
-            .baseUri("/oauth2/code/*")
+            .baseUri("/")
             ;
 
         return http.build();

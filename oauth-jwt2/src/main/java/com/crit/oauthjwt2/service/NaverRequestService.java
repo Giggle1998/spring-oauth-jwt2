@@ -2,6 +2,7 @@ package com.crit.oauthjwt2.service;
 
 import com.crit.oauthjwt2.common.security.SecurityUtil;
 import com.crit.oauthjwt2.dto.*;
+import com.crit.oauthjwt2.entity.User;
 import com.crit.oauthjwt2.entity.UserRepository;
 import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class NaverRequestService implements RequestService {
     private String USER_INFO_URI;
 
     @Override
-    public SignInResponse redirect(TokenRequest tokenRequest) {
+    public OAuthSignInResponse redirect(TokenRequest tokenRequest) {
         TokenResponse tokenResponse = getToken(tokenRequest);
         NaverUserInfo naverUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
@@ -45,16 +46,24 @@ public class NaverRequestService implements RequestService {
                     naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getAccessToken());
             String refreshToken = securityUtil.createRefreshToken(
                     naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getRefreshToken());
-            return SignInResponse.builder()
+            return OAuthSignInResponse.builder()
                     .authProvider(AuthProvider.NAVER)
+                    .id(naverUserInfo.getResponse().getId())
+                    .nickname(naverUserInfo.getResponse().getName())
+                    .email(naverUserInfo.getResponse().getEmail())
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
         } else {
-            return SignInResponse.builder()
+            OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
                     .authProvider(AuthProvider.NAVER)
-                    .naverUserInfo(naverUserInfo)
+                    .id(naverUserInfo.getResponse().getId())
+                    .nickname(naverUserInfo.getResponse().getName())
+                    .email(naverUserInfo.getResponse().getEmail())
                     .build();
+            User userEntity = oAuthSignInResponse.toEntity();
+            userRepository.save(userEntity);
+            return oAuthSignInResponse;
         }
     }
 

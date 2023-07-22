@@ -2,9 +2,10 @@ package com.crit.oauthjwt2.service;
 
 import com.crit.oauthjwt2.common.security.SecurityUtil;
 import com.crit.oauthjwt2.dto.GoogleUserInfo;
-import com.crit.oauthjwt2.dto.SignInResponse;
+import com.crit.oauthjwt2.dto.OAuthSignInResponse;
 import com.crit.oauthjwt2.dto.TokenRequest;
 import com.crit.oauthjwt2.dto.TokenResponse;
+import com.crit.oauthjwt2.entity.User;
 import com.crit.oauthjwt2.entity.UserRepository;
 import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class GoogleRequestService implements RequestService {
     private String REDIRECT_URI;
 
     @Override
-    public SignInResponse redirect(TokenRequest tokenRequest) {
+    public OAuthSignInResponse redirect(TokenRequest tokenRequest) {
         TokenResponse tokenResponse = getToken(tokenRequest);
         GoogleUserInfo googleUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
@@ -51,16 +52,24 @@ public class GoogleRequestService implements RequestService {
                     googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getAccessToken());
             String refreshToken = securityUtil.createRefreshToken(
                     googleUserInfo.getId(), AuthProvider.GOOGLE, tokenResponse.getRefreshToken());
-            return SignInResponse.builder()
+            return OAuthSignInResponse.builder()
                     .authProvider(AuthProvider.GOOGLE)
+                    .id(googleUserInfo.getId())
+                    .nickname(googleUserInfo.getName())
+                    .email(googleUserInfo.getEmail())
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
         } else {
-            return SignInResponse.builder()
+            OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
                     .authProvider(AuthProvider.GOOGLE)
-                    .googleUserInfo(googleUserInfo)
+                    .id(googleUserInfo.getId())
+                    .nickname(googleUserInfo.getName())
+                    .email(googleUserInfo.getEmail())
                     .build();
+            User userEntity = oAuthSignInResponse.toEntity();
+            userRepository.save(userEntity);
+            return oAuthSignInResponse;
         }
     }
 

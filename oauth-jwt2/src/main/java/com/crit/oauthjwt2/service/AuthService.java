@@ -2,7 +2,7 @@ package com.crit.oauthjwt2.service;
 
 import com.crit.oauthjwt2.common.exception.BadRequestException;
 import com.crit.oauthjwt2.common.security.SecurityUtil;
-import com.crit.oauthjwt2.dto.SignInResponse;
+import com.crit.oauthjwt2.dto.OAuthSignInResponse;
 import com.crit.oauthjwt2.dto.TokenRequest;
 import com.crit.oauthjwt2.dto.TokenResponse;
 import com.crit.oauthjwt2.entity.UserRepository;
@@ -19,7 +19,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
 
-    public SignInResponse redirect(TokenRequest tokenRequest){
+    public OAuthSignInResponse redirect(TokenRequest tokenRequest){
         if(AuthProvider.KAKAO.getAuthProvider().equals(tokenRequest.getRegistrationId())){
             return kakaoRequestService.redirect(tokenRequest);
         } else if(AuthProvider.NAVER.getAuthProvider().equals(tokenRequest.getRegistrationId())){
@@ -31,7 +31,7 @@ public class AuthService {
         throw new BadRequestException("not supported oauth provider");
     }
 
-    public SignInResponse refreshToken(TokenRequest tokenRequest){
+    public OAuthSignInResponse refreshToken(TokenRequest tokenRequest){
         String userId = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("userId");
         String provider = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("provider");
         String oldRefreshToken = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("refreshToken");
@@ -52,7 +52,7 @@ public class AuthService {
         String accessToken = securityUtil.createAccessToken(
                 userId, AuthProvider.findByCode(provider.toLowerCase()), tokenResponse.getAccessToken());
 
-        return SignInResponse.builder()
+        return OAuthSignInResponse.builder()
                 .authProvider(AuthProvider.findByCode(provider.toLowerCase()))
                 .accessToken(accessToken)
                 .refreshToken(null)

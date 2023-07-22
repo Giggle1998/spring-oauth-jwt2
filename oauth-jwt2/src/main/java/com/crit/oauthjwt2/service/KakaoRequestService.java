@@ -34,7 +34,7 @@ public class KakaoRequestService implements RequestService {
     private String TOKEN_URI;
 
     @Override
-    public SignInResponse redirect(TokenRequest tokenRequest) {
+    public OAuthSignInResponse redirect(TokenRequest tokenRequest) {
         System.out.println(tokenRequest.getRegistrationId());
         System.out.println("=========getToken 중==============");
         TokenResponse tokenResponse = getToken(tokenRequest);
@@ -52,7 +52,7 @@ public class KakaoRequestService implements RequestService {
                     String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
             String refreshToken = securityUtil.createRefreshToken(
                     String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
-            return SignInResponse.builder()
+            return OAuthSignInResponse.builder()
                     .authProvider(AuthProvider.KAKAO)
                     .id(String.valueOf(id))
                     .nickname(nickname)
@@ -61,15 +61,15 @@ public class KakaoRequestService implements RequestService {
                     .refreshToken(refreshToken)
                     .build();
         } else {
-            SignInResponse signInResponse = SignInResponse.builder()
+            OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
                     .authProvider(AuthProvider.KAKAO)
                     .id(String.valueOf(id))
                     .nickname(nickname)
                     .email(email)
                     .build();
-            User userEntity = signInResponse.toEntity();
+            User userEntity = oAuthSignInResponse.toEntity();
             userRepository.save(userEntity);
-            return signInResponse;
+            return oAuthSignInResponse;
         }
     }
 

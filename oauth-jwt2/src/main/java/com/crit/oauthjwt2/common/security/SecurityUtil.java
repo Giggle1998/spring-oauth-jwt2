@@ -41,11 +41,11 @@ public class SecurityUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, secret);
-
+        // claim 없는 경우 추가
         if (claim != null) {
             jwtBuilder.setClaims(claim);
         }
-
+        // 기간이
         if (expiration != null) {
             jwtBuilder.setExpiration(new Date(new Date().getTime() + expiration));
         }

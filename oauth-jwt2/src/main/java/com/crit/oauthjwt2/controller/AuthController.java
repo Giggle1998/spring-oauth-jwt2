@@ -1,6 +1,6 @@
 package com.crit.oauthjwt2.controller;
 
-import com.crit.oauthjwt2.dto.SignInResponse;
+import com.crit.oauthjwt2.dto.OAuthSignInResponse;
 import com.crit.oauthjwt2.dto.TokenRequest;
 import com.crit.oauthjwt2.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/login/oauth2/code/{registrationId}")
-    public ResponseEntity<SignInResponse> redirect(
+    public ResponseEntity<OAuthSignInResponse> redirect(
             @PathVariable("registrationId") String registrationId
             , @RequestParam("code") String code
             , @RequestParam("state") String state) {
@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/token")
-    public ResponseEntity<SignInResponse> refreshToken(@RequestBody TokenRequest tokenRequest){
+    public ResponseEntity<OAuthSignInResponse> refreshToken(@RequestBody TokenRequest tokenRequest){
         return ResponseEntity.ok(authService.refreshToken(tokenRequest));
     }
 }
