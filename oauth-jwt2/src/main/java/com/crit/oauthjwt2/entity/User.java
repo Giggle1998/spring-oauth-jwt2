@@ -60,8 +60,9 @@ public class User extends BaseTimeEntity {
     ** 엔티티 관련 비즈니스 로직
      */
 
-    public void updateRefreshToken(String refreshToken) {
+    public void updateRefreshToken(String refreshTokenm, Date refreshTokenExpirationTime) {
         this.refreshToken = refreshToken;
+        this.tokenExpirationTime = tokenExpirationTime;
     }
 
     public void expireRefreshToken(Date now) {

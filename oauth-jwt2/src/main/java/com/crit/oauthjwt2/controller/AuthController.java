@@ -17,9 +17,6 @@ public class AuthController {
             @PathVariable("registrationId") String registrationId
             , @RequestParam("code") String code
             , @RequestParam("state") String state) {
-        System.out.println("=======================");
-        System.out.println(registrationId + code + state);
-        System.out.println("=======================");
         return ResponseEntity.ok(
                 authService.redirect(
                     TokenRequest.builder()

@@ -14,6 +14,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class KakaoRequestService implements RequestService {
@@ -35,7 +37,6 @@ public class KakaoRequestService implements RequestService {
 
     @Override
     public OAuthSignInResponse redirect(TokenRequest tokenRequest) {
-        System.out.println(tokenRequest.getRegistrationId());
         TokenResponse tokenResponse = getToken(tokenRequest);
         KakaoUserInfo kakaoUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
@@ -60,10 +61,15 @@ public class KakaoRequestService implements RequestService {
                 .build();
 
         // 기존 유저 정보가 존재하면 DB에 저장
-        if(!userRepository.existsById(String.valueOf(kakaoUserInfo.getId()))){
-            User userEntity = oAuthSignInResponse.toEntity();
-            userRepository.save(userEntity);
+        User userEntity;
+        if (!userRepository.existsById(String.valueOf(kakaoUserInfo.getId()))) {
+            userEntity = oAuthSignInResponse.toEntity();
+        } else {
+            userEntity = userRepository.findById(String.valueOf(id))
+                    .orElseThrow(() -> new IllegalStateException("유저 아이디가 없습니다."));
+            userEntity.updateRefreshToken(refreshTokenDto.getToken(), refreshTokenDto.getTokenExpirationTime());
         }
+        userRepository.save(userEntity);
         return oAuthSignInResponse;
     }
 
@@ -74,10 +80,6 @@ public class KakaoRequestService implements RequestService {
         formData.add("redirect_uri", REDIRECT_URI);
         formData.add("client_id", CLIENT_ID);
         formData.add("code", tokenRequest.getCode());
-        System.out.println(GRANT_TYPE);
-        System.out.println(REDIRECT_URI);
-        System.out.println(CLIENT_ID);
-        System.out.println(tokenRequest.getCode());
         return webClient.mutate()
                 .baseUrl(TOKEN_URI)
                 .build()

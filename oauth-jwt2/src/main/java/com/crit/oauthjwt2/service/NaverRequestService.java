@@ -56,11 +56,15 @@ public class NaverRequestService implements RequestService {
                 .refreshTokenExpirationTime(refreshTokenDto.getTokenExpirationTime())
                 .build();
 
+        User userEntity;
         if(!userRepository.existsById(naverUserInfo.getResponse().getId())){
-            User userEntity = oAuthSignInResponse.toEntity();
-            userRepository.save(userEntity);
+            userEntity = oAuthSignInResponse.toEntity();
+        } else {
+            userEntity = userRepository.findById(String.valueOf(naverUserInfo.getResponse().getId()))
+                    .orElseThrow(() -> new IllegalStateException("유저 아이디가 없습니다."));
+            userEntity.updateRefreshToken(refreshTokenDto.getToken(), refreshTokenDto.getTokenExpirationTime());
         }
-
+        userRepository.save(userEntity);
         return oAuthSignInResponse;
 
     }
