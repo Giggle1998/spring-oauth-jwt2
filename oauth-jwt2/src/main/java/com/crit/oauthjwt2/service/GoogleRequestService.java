@@ -56,6 +56,7 @@ public class GoogleRequestService implements RequestService {
                 .email(googleUserInfo.getEmail())
                 .accessToken(accessTokenDto.getToken())
                 .refreshToken(refreshTokenDto.getToken())
+                .refreshTokenExpirationTime(refreshTokenDto.getTokenExpirationTime())
                 .build();
 
         if(!userRepository.existsById(googleUserInfo.getId())){

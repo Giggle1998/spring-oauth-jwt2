@@ -36,12 +36,7 @@ public class KakaoRequestService implements RequestService {
     @Override
     public OAuthSignInResponse redirect(TokenRequest tokenRequest) {
         System.out.println(tokenRequest.getRegistrationId());
-        System.out.println("=========getToken 중==============");
         TokenResponse tokenResponse = getToken(tokenRequest);
-        System.out.println(tokenResponse.getAccessToken());
-        System.out.println(tokenResponse.getRefreshToken());
-        System.out.println(tokenResponse.getRefreshTokenExpiresIn());
-        System.out.println("=========getUserInfo 중==============");
         KakaoUserInfo kakaoUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
         Long id = kakaoUserInfo.getId();
@@ -61,6 +56,7 @@ public class KakaoRequestService implements RequestService {
                 .email(email)
                 .accessToken(accessTokenDto.getToken())
                 .refreshToken(refreshTokenDto.getToken())
+                .refreshTokenExpirationTime(refreshTokenDto.getTokenExpirationTime())
                 .build();
 
         // 기존 유저 정보가 존재하면 DB에 저장

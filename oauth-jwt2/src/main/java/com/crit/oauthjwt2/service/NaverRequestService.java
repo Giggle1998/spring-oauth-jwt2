@@ -53,6 +53,7 @@ public class NaverRequestService implements RequestService {
                 .email(naverUserInfo.getResponse().getEmail())
                 .accessToken(accessTokenDto.getToken())
                 .refreshToken(refreshTokenDto.getToken())
+                .refreshTokenExpirationTime(refreshTokenDto.getTokenExpirationTime())
                 .build();
 
         if(!userRepository.existsById(naverUserInfo.getResponse().getId())){
