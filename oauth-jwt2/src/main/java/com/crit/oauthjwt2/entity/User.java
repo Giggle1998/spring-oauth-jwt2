@@ -5,6 +5,7 @@ import com.crit.oauthjwt2.enumType.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import java.util.Date;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "user_tbl")
+@Table(name = "users")
 public class User extends BaseTimeEntity {
     @Id
     private String id;
@@ -60,13 +61,13 @@ public class User extends BaseTimeEntity {
     /*
     ** 엔티티 관련 비즈니스 로직
      */
-    public void passwordEncode(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
+    public void passwordEncode(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.password = bCryptPasswordEncoder.encode(this.password);
     }
 
-    public void updateRefreshToken(String refreshTokenm, Date refreshTokenExpirationTime) {
+    public void updateRefreshToken(String refreshToken, Date refreshTokenExpirationTime) {
         this.refreshToken = refreshToken;
-        this.tokenExpirationTime = tokenExpirationTime;
+        this.tokenExpirationTime = refreshTokenExpirationTime;
     }
 
     public void expireRefreshToken(Date now) {
