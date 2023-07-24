@@ -42,9 +42,9 @@ public class NaverRequestService implements RequestService {
         NaverUserInfo naverUserInfo = getUserInfo(tokenResponse.getAccessToken());
 
         TokenDto accessTokenDto = securityUtil.createAccessToken(
-                naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getAccessToken());
+                naverUserInfo.getResponse().getId(), AuthProvider.NAVER);
         TokenDto refreshTokenDto = securityUtil.createRefreshToken(
-                naverUserInfo.getResponse().getId(), AuthProvider.NAVER, tokenResponse.getRefreshToken());
+                naverUserInfo.getResponse().getId(), AuthProvider.NAVER);
 
         OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
                 .authProvider(AuthProvider.NAVER)

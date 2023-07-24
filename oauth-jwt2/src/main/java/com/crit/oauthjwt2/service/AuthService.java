@@ -10,6 +10,7 @@ import com.crit.oauthjwt2.entity.UserRepository;
 import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
 
+    @Transactional
     public OAuthSignInResponse redirect(TokenRequest tokenRequest){
         if(AuthProvider.KAKAO.getAuthProvider().equals(tokenRequest.getRegistrationId())){
             return kakaoRequestService.redirect(tokenRequest);
@@ -51,7 +53,7 @@ public class AuthService {
         }
         // access 토큰 생성
         TokenDto accessTokenDto = securityUtil.createAccessToken(
-                userId, AuthProvider.findByCode(provider.toLowerCase()), tokenResponse.getAccessToken());
+                userId, AuthProvider.findByCode(provider.toLowerCase()));
 
         return OAuthSignInResponse.builder()
                 .authProvider(AuthProvider.findByCode(provider.toLowerCase()))

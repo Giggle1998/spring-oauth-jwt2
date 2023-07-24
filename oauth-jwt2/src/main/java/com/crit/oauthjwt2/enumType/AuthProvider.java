@@ -6,7 +6,7 @@ public enum AuthProvider {
     GOOGLE("google"),
     KAKAO("kakao"),
     NAVER("naver"),
-    EMPTY("");
+    EMPTY("local");
 
     private String authProvider;
 

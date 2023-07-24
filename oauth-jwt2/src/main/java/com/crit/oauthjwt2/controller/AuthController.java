@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
-    @GetMapping("/login/oauth2/code/{registrationId}")
+    @PostMapping("/login/oauth2/code/{registrationId}")
     public ResponseEntity<OAuthSignInResponse> redirect(
             @PathVariable("registrationId") String registrationId
             , @RequestParam("code") String code

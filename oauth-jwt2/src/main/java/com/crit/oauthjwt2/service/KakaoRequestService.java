@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -45,10 +46,10 @@ public class KakaoRequestService implements RequestService {
         String email = kakaoUserInfo.getKakaoAccount().getEmail();
 
         TokenDto accessTokenDto = securityUtil.createAccessToken(
-                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getAccessToken());
+                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO);
         // 진짜 Refresh Token을 만드는 과정
         TokenDto refreshTokenDto = securityUtil.createRefreshToken(
-                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO, tokenResponse.getRefreshToken());
+                String.valueOf(kakaoUserInfo.getId()), AuthProvider.KAKAO);
 
         OAuthSignInResponse oAuthSignInResponse = OAuthSignInResponse.builder()
                 .authProvider(AuthProvider.KAKAO)

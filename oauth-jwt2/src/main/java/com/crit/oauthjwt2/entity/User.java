@@ -5,6 +5,7 @@ import com.crit.oauthjwt2.enumType.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -59,6 +60,9 @@ public class User extends BaseTimeEntity {
     /*
     ** 엔티티 관련 비즈니스 로직
      */
+    public void passwordEncode(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
+    }
 
     public void updateRefreshToken(String refreshTokenm, Date refreshTokenExpirationTime) {
         this.refreshToken = refreshToken;
@@ -72,7 +76,6 @@ public class User extends BaseTimeEntity {
     public User update(String name, String picture){
         this.nickname = name;
         this.profileImageUrl = picture;
-
         return this;
     }
 
