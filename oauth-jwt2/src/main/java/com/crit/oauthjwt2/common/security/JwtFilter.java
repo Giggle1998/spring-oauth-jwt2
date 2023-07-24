@@ -48,6 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                log.info("Bearer check");
                 token = authorizationHeader.substring(7);
 
                 if (securityUtil.isExpiration(token)) { // 만료되었는지 체크
@@ -56,8 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 userId = (String) securityUtil.get(token).get("userId");
                 provider = (String) securityUtil.get(token).get("provider");
-
-                if(!userRepository.existsByIdAndAuthProvider(userId, AuthProvider.findByCode(provider))){
+                if(!userRepository.existsById(userId)){
                     throw new BadRequestException("CANNOT_FOUND_USER");
                 }
             }
