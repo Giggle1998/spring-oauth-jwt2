@@ -1,5 +1,6 @@
 package com.crit.oauthjwt2.common.security;
 
+import com.crit.oauthjwt2.entity.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig{
 
-//    private final UserRepository userRepository;
-//    private final SecurityUtil securityUtil;
-    private final ObjectMapper objectMapper;
+    private final SecurityUtil securityUtil;
+    private final UserRepository userRepository;
+
     @Value("app.auth.token-secret") private String key;
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -35,7 +36,7 @@ public class SecurityConfig{
                 .and()
 
                 .authorizeRequests()
-                .antMatchers("/api/auth/**", "/user", "/login/oauth2/**", "/h2-console/**").permitAll()
+                .antMatchers("/api/auth/**", "/login/oauth2/**", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
@@ -47,7 +48,7 @@ public class SecurityConfig{
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
-                .addFilterBefore(new JwtFilter(key), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtFilter(securityUtil, userRepository), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

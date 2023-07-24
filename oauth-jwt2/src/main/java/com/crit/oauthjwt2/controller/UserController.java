@@ -31,6 +31,6 @@ public class UserController {
     @PostMapping("/logout")
     public String logOut(@RequestBody LogOutRequestDto logOutRequestDto) {
         userService.logOut(logOutRequestDto);
-        return "로그아웃 완료";
+        return "success logout";
     }
 }

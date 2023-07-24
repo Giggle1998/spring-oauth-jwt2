@@ -1,12 +1,13 @@
 package com.crit.oauthjwt2.common.security;
 
-import com.crit.oauthjwt2.service.UserService;
-import com.crit.oauthjwt2.util.JwtUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
+import com.crit.oauthjwt2.common.exception.BadRequestException;
+import com.crit.oauthjwt2.entity.UserRepository;
+import com.crit.oauthjwt2.enumType.AuthProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,66 +20,105 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+
+@Slf4j
+@Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
-    private final String key;
+    private final SecurityUtil securityUtil;
+    private final UserRepository userRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        try {
+            String authorizationHeader = request.getHeader("Authorization");
+            String token = null;
+            String userId = null;
+            String provider = null;
 
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            if (request.getServletPath().equals("/members/oauth/token")) {
+            if (request.getServletPath().startsWith("/api/auth") || request.getServletPath().startsWith("/login/oauth2")) {
                 filterChain.doFilter(request, response);
-            } else {
-
-                request.setAttribute("Authorization", "Token이 없습니다.");
-                String errorCode = "Token이 없습니다.";
-                final Map<String, Object> body = new HashMap<>();
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-                body.put("status", 402);
-                body.put("error", "Empty");
-                body.put("message", errorCode);
-                body.put("path", request.getServletPath());
-                final ObjectMapper mapper = new ObjectMapper();
-
-                mapper.writeValue(response.getOutputStream(), body);
-                response.setStatus(HttpServletResponse.SC_OK);
-
             }
-        } else {
-            String token = authorization.split(" ")[1];
-            String Id = "";
-            try {
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                token = authorizationHeader.substring(7);
 
-                if (JwtUtil.isExpired(token, key)) {
-
-                } else {
-
-                    Id = JwtUtil.getMemberId(token, key);
-
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            Id, null, List.of(new SimpleGrantedAuthority("USER")));
-                    authenticationToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                if (securityUtil.isExpiration(token)) { // 만료되었는지 체크
+                    throw new BadRequestException("EXPIRED_ACCESS_TOKEN");
                 }
 
-            } catch (ExpiredJwtException e) {
-                e.printStackTrace();
-                request.setAttribute("Authorization", "토큰이 만료되었습니다.");
+                userId = (String) securityUtil.get(token).get("userId");
+                provider = (String) securityUtil.get(token).get("provider");
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                request.setAttribute("Authorization", "유효하지 않은 토큰입니다.");
-
+                if(!userRepository.existsByIdAndAuthProvider(userId, AuthProvider.findByCode(provider))){
+                    throw new BadRequestException("CANNOT_FOUND_USER");
+                }
             }
+            // 인증 정보 등록 및 다음 체인으로 이동
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    userId, null, List.of(new SimpleGrantedAuthority("USER")));
+            authenticationToken.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             filterChain.doFilter(request, response);
+
+        } catch (BadRequestException e) {
+            if (e.getMessage().equalsIgnoreCase("EXPIRED_ACCESS_TOKEN")) {
+                writeErrorLogs("EXPIRED_ACCESS_TOKEN", e.getMessage(), e.getStackTrace());
+                JSONObject jsonObject = createJsonError(String.valueOf(UNAUTHORIZED.value()), e.getMessage());
+                setJsonResponse(response, UNAUTHORIZED, jsonObject.toString());
+            } else if (e.getMessage().equalsIgnoreCase("CANNOT_FOUND_USER")) {
+                writeErrorLogs("CANNOT_FOUND_USER", e.getMessage(), e.getStackTrace());
+                JSONObject jsonObject = createJsonError(String.valueOf(UNAUTHORIZED.value()), e.getMessage());
+                setJsonResponse(response, UNAUTHORIZED, jsonObject.toString());
+            }
+        } catch (Exception e) {
+            writeErrorLogs("Exception", e.getMessage(), e.getStackTrace());
+
+            if (response.getStatus() == HttpStatus.OK.value()) {
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            }
+        } finally {
+            log.debug("**** SECURITY FILTER FINISH");
         }
+    }
+
+    private JSONObject createJsonError(String errorCode, String errorMessage) {
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("error_code", errorCode);
+            jsonObject.put("error_message", errorMessage);
+        } catch (JSONException ex) {
+            writeErrorLogs("JSONException", ex.getMessage(), ex.getStackTrace());
+        }
+
+        return jsonObject;
+    }
+
+    private void setJsonResponse(HttpServletResponse response, HttpStatus httpStatus, String jsonValue) {
+        response.setStatus(httpStatus.value());
+        response.setContentType(APPLICATION_JSON_VALUE);
+
+        try {
+            response.getWriter().write(jsonValue);
+            response.getWriter().flush();
+            response.getWriter().close();
+        } catch (IOException ex) {
+            writeErrorLogs("IOException", ex.getMessage(), ex.getStackTrace());
+        }
+    }
+
+    private void writeErrorLogs(String exception, String message, StackTraceElement[] stackTraceElements) {
+        log.error("**** " + exception + " ****");
+        log.error("**** error message : " + message);
+        log.error("**** stack trace : " + Arrays.toString(stackTraceElements));
     }
 }

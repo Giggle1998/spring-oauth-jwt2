@@ -90,4 +90,9 @@ public class SecurityUtil {
 
         return new Date().getTime() > (expirationTime - weekTime);
     }
+
+    public String getUserId(String token) {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token)
+                .getBody().get("userId", String.class);
+    }
 }
