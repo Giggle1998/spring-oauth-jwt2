@@ -39,7 +39,7 @@ public class AuthService {
         String provider = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("provider");
         String oldRefreshToken = (String) securityUtil.get(tokenRequest.getRefreshToken()).get("refreshToken");
 
-        if(!userRepository.existsByIdAndAuthProvider(userId, AuthProvider.findByCode(provider))){
+        if(!userRepository.existsByIdAndAuthProvider(userId, AuthProvider.findByCode(provider.toLowerCase()))){
             throw new BadRequestException("CANNOT_FOUND_USER");
         }
 

@@ -1,7 +1,6 @@
 package com.crit.oauthjwt2.common.security;
 
 import com.crit.oauthjwt2.entity.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

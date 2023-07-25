@@ -18,16 +18,15 @@ public class SecurityUtil {
     private static final Long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60L; // 1 hours
     private static final Long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30L; // 30 days
 
-    public TokenDto createAccessToken(
-            String userId, AuthProvider provider) {
+    public TokenDto createAccessToken(String userId, AuthProvider provider) {
+        System.out.println("====createAccessToken=====" + provider + "===========");
         HashMap<String, Object> claim = new HashMap<>();
         claim.put("userId", userId);
         claim.put("provider", provider);
         return createJwt("ACCESS_TOKEN", ACCESS_TOKEN_EXPIRATION_TIME, claim);
     }
 
-    public TokenDto createRefreshToken(
-            String userId, AuthProvider provider) {
+    public TokenDto createRefreshToken(String userId, AuthProvider provider) {
         HashMap<String, Object> claim = new HashMap<>();
         claim.put("userId", userId);
         claim.put("provider", provider);
@@ -51,8 +50,7 @@ public class SecurityUtil {
             jwtBuilder.setExpiration(date);
         }
         String token = jwtBuilder.compact();
-        Date tokenExpirationTime = date;
-        return new TokenDto(token, tokenExpirationTime);
+        return new TokenDto(token, date);
     }
 
     /**

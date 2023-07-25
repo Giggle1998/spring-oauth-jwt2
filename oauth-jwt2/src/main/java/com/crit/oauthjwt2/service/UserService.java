@@ -73,4 +73,18 @@ public class UserService {
         User user = userRepository.findByRefreshToken(logOutRequestDto.getRefreshToken()).get();
         user.expireRefreshToken(new Date());
     }
+    @Transactional(readOnly = true)
+    public TokenDto getAccessToken(String refreshToken) {
+        String userId = (String) securityUtil.get(refreshToken).get("userId");
+        String provider = (String) securityUtil.get(refreshToken).get("provider");
+        System.out.println("in getAccessToken " + userId + "  " + provider);
+
+        if(!userRepository.existsByIdAndAuthProvider(userId, AuthProvider.findByCode(provider.toLowerCase()))){
+            throw new BadRequestException("CANNOT_FOUND_USER");
+        } else if (securityUtil.isExpiration(refreshToken)) {
+            throw new BadRequestException("TOKEN_EXPIRED");
+        }
+
+        return securityUtil.createAccessToken(userId, AuthProvider.findByCode(provider));
+    }
 }
