@@ -3,12 +3,16 @@ package com.crit.oauthjwt2.service;
 import com.crit.oauthjwt2.dto.pay.KakaoApproveResponse;
 import com.crit.oauthjwt2.dto.pay.KakaoCancelResponse;
 import com.crit.oauthjwt2.dto.pay.KakaoReadyResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+@Service
+@RequiredArgsConstructor
 public class KakaoService {
     static final String cid = "TC0ONETIME"; // 가맹점 테스트 코드
     static final String admin_Key = "86f8e70b2e6f309e47d76e82c0e84441"; // 공개 조심! 본인 애플리케이션의 어드민 키를 넣어주세요
@@ -17,7 +21,7 @@ public class KakaoService {
     /**
      * 결제 요청
      */
-    public KakaoReadyResponse kakaoPayReady() {
+    public KakaoReadyResponse kakaoPayReady(String amount) {
 
         // 카카오페이 요청 양식
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
@@ -26,7 +30,7 @@ public class KakaoService {
         parameters.add("partner_user_id", "crit_user_id");
         parameters.add("item_name", "챌린지 결제");
         parameters.add("quantity", "1");
-        parameters.add("total_amount", "1000");
+        parameters.add("total_amount", String.valueOf(amount));
         parameters.add("vat_amount", "0");
         parameters.add("tax_free_amount", "0");
         parameters.add("approval_url", "http://localhost:8080/payment/success"); // 성공 시 redirect url
@@ -77,15 +81,15 @@ public class KakaoService {
     /**
      * 결제 환불
      */
-    public KakaoCancelResponse kakaoCancel() {
+    public KakaoCancelResponse kakaoCancel(String amount) {
 
         // 카카오페이 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
-        parameters.add("tid", "환불할 결제 고유 번호");
-        parameters.add("cancel_amount", "환불 금액");
-        parameters.add("cancel_tax_free_amount", "환불 비과세 금액");
-        parameters.add("cancel_vat_amount", "환불 부가세");
+        parameters.add("tid", kakaoReady.getTid());
+        parameters.add("cancel_amount", String.valueOf(amount));
+        parameters.add("cancel_tax_free_amount", "0");
+        parameters.add("cancel_vat_amount", "0");
 
         // 파라미터, 헤더
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());

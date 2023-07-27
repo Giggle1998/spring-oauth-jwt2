@@ -14,14 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 @RequestMapping("/payment")
 public class PayController {
-    private KakaoService kakaoService;
+    private final KakaoService kakaoService;
 
-    @PostMapping("/pay")
+    @GetMapping("/pay")
     public ResponseEntity<KakaoReadyResponse> getPay(HttpServletRequest request, String amount) {
         // 추후 챌린지 정보에서 금액을 받아와서 로직 작성
         String token = request.getHeader("Authorization").substring(7);
         System.out.println("==========pay===== " + amount);
-        return ResponseEntity.ok(kakaoService.kakaoPayReady());
+        return ResponseEntity.ok(kakaoService.kakaoPayReady(amount));
     }
 
     @GetMapping("/success")
@@ -39,8 +39,11 @@ public class PayController {
         return "payment/cancel";
     }
 
-    @PostMapping("/refund")
-    public ResponseEntity<KakaoCancelResponse> refund() {
-        return ResponseEntity.ok(kakaoService.kakaoCancel());
+    @GetMapping("/refund")
+    public ResponseEntity<KakaoCancelResponse> refund(HttpServletRequest request, @RequestParam("amount") String amount) {
+        // 추후 챌린지 정보에서 금액을 받아와서 로직 작성
+        String token = request.getHeader("Authorization").substring(7);
+        // 결제 TID를 가져오기 -> DB에 넣기
+        return ResponseEntity.ok(kakaoService.kakaoCancel(amount));
     }
 }
