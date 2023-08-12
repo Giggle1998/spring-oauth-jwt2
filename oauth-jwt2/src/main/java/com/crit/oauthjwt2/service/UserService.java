@@ -8,6 +8,7 @@ import com.crit.oauthjwt2.entity.UserRepository;
 import com.crit.oauthjwt2.enumType.AuthProvider;
 import com.crit.oauthjwt2.enumType.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public String signUp(SignUpRequestDto signUpRequestDto) throws Exception {
         if (userRepository.findById(signUpRequestDto.getId()).isPresent()) {
@@ -54,8 +57,11 @@ public class UserService {
         TokenDto accessTokenDto = securityUtil.createAccessToken(logInRequestDto.getId(), user.getAuthProvider());
         TokenDto refreshTokenDto = securityUtil.createRefreshToken(logInRequestDto.getId(), user.getAuthProvider());
 
-        user.updateRefreshToken(refreshTokenDto.getToken(), refreshTokenDto.getTokenExpirationTime());
+        // Redis에 RefreshToken 저장
+        redisTemplate.opsForValue()
+                .set("RefreshToken:" + user.getId(), refreshTokenDto.getToken(), refreshTokenDto.getTokenExpirationTime().getTime(), TimeUnit.MILLISECONDS);
 
+//        user.updateRefreshToken(refreshTokenDto.getToken(), refreshTokenDto.getTokenExpirationTime());
         return LogInResponseDto.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
