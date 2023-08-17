@@ -85,11 +85,15 @@ public class UserService {
         String provider = (String) securityUtil.get(refreshToken).get("provider");
         System.out.println("in getAccessToken " + userId + "  " + provider);
 
+
         if(!userRepository.existsByIdAndAuthProvider(userId, AuthProvider.findByCode(provider.toLowerCase()))){
             throw new BadRequestException("CANNOT_FOUND_USER");
         } else if (securityUtil.isExpiration(refreshToken)) {
             throw new BadRequestException("TOKEN_EXPIRED");
         }
+        TokenDto refreshTokenDto = securityUtil.createRefreshToken(userId, AuthProvider.findByCode(provider));
+        redisTemplate.opsForValue()
+                .set("RefreshToken:" + userId, refreshTokenDto.getToken(), refreshTokenDto.getTokenExpirationTime().getTime(), TimeUnit.MILLISECONDS);
 
         return securityUtil.createAccessToken(userId, AuthProvider.findByCode(provider));
     }
