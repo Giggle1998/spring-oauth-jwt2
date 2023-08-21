@@ -21,9 +21,7 @@ public class RedisController {
     public ResponseEntity<Object> getRedis(HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader("Authorization").substring(7);
         String userId = (String)securityUtil.get(token).get("userId");
-        log.info(userId);
         Object refreshToken = redisTemplate.opsForValue().get("RefreshToken:"+userId);
-        log.info(refreshToken.toString());
         return ResponseEntity.ok(refreshToken);
 
     }
