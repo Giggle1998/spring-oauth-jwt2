@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class TestController {
     private final SecurityUtil securityUtil;
+
     @GetMapping("/test")
     public String getTest(HttpServletRequest httpServletRequest) {
         String authorizationHeader = httpServletRequest.getHeader("Authorization");
@@ -19,5 +20,15 @@ public class TestController {
         System.out.println("===================testing=====================");
         System.out.println("=========" + userId + "=============");
         return "success Test";
+    }
+
+    @GetMapping("/test2")
+    public String getTest2(HttpServletRequest httpServletRequest) {
+        String authorizationHeader = httpServletRequest.getHeader("Authorization");
+        String token = authorizationHeader.substring(7);
+        String provider = (String) securityUtil.get(token).get("provider");
+        System.out.println("===================testing=====================");
+        System.out.println("=========" + provider + "=============");
+        return "success Test2";
     }
 }
